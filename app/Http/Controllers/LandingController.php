@@ -21,7 +21,7 @@ class LandingController extends Controller
             ->where('status', Report::STATUS_COMPLETED)
             ->whereNotNull('photo_after')
             ->latest('updated_at')
-            ->take(6)
+            ->take(7)
             ->get();
 
         $categories = Category::orderBy('name')->get();
