@@ -15,7 +15,14 @@ class RoleMiddleware
     {
         $user = $request->user();
 
-        if (! $user || ! in_array($user->role, $roles, true)) {
+        if (! $user) {
+            abort(403, 'Anda tidak memiliki hak akses ke halaman ini.');
+        }
+
+        $userRole = strtolower((string) $user->role);
+        $allowedRoles = array_map(static fn (string $role) => strtolower($role), $roles);
+
+        if (! in_array($userRole, $allowedRoles, true)) {
             abort(403, 'Anda tidak memiliki hak akses ke halaman ini.');
         }
 

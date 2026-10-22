@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Report;
 use App\Models\User;
+use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -56,7 +57,6 @@ class ReportController extends Controller
             ->oldest()
             ->paginate(10);
 
-        // ID kategori yang sudah memiliki minimal satu petugas.
         $coveredCategoryIds = User::where('role', User::ROLE_PETUGAS)
             ->whereNotNull('category_id')
             ->where('is_active', true)
@@ -89,10 +89,6 @@ class ReportController extends Controller
         ));
     }
 
-    /**
-     * Petugas hanya melihat laporan pada kategori pekerjaannya:
-     * antrean (VALIDATED), tugas miliknya, tugas rekan, dan riwayat selesai.
-     */
     private function petugasDashboard(Request $request): View
     {
         $user = $request->user();
@@ -170,7 +166,20 @@ class ReportController extends Controller
         $data['user_id'] = $request->user()->id;
         $data['status'] = Report::STATUS_PENDING;
 
-        Report::create($data);
+        $report = Report::create($data);
+
+        app(AuditLogger::class)->log(
+            'report.created',
+            'report',
+            $report->id,
+            'Laporan dibuat oleh warga.',
+            null,
+            [
+                'title' => $report->title,
+                'category_id' => $report->category_id,
+                'location' => $report->location,
+            ]
+        );
 
         return redirect()->route('dashboard')
             ->with('success', 'Laporan berhasil dikirim dan menunggu verifikasi admin.');
@@ -205,19 +214,39 @@ class ReportController extends Controller
                     . '". Tambahkan petugas terlebih dahulu sebelum menyetujui laporan ini.');
             }
 
+            $oldStatus = $report->status;
             $report->update([
                 'status' => Report::STATUS_VALIDATED,
                 'rejection_note' => null,
             ]);
 
+            app(AuditLogger::class)->log(
+                'report.validated',
+                'report',
+                $report->id,
+                'Laporan disetujui dan masuk antrean petugas.',
+                ['status' => $oldStatus],
+                ['status' => $report->status]
+            );
+
             return back()->with('success', 'Laporan #' . $report->id . ' disetujui dan masuk antrean petugas '
                 . $report->category->name . '.');
         }
 
+        $oldStatus = $report->status;
         $report->update([
             'status' => Report::STATUS_REJECTED,
             'rejection_note' => $data['rejection_note'],
         ]);
+
+        app(AuditLogger::class)->log(
+            'report.rejected',
+            'report',
+            $report->id,
+            'Laporan ditolak oleh admin.',
+            ['status' => $oldStatus],
+            ['status' => $report->status, 'rejection_note' => $data['rejection_note']]
+        );
 
         return back()->with('success', 'Laporan #' . $report->id . ' ditolak (REJECTED).');
     }
@@ -244,6 +273,15 @@ class ReportController extends Controller
             return back()->with('error', 'Laporan ini sudah diambil petugas lain atau tidak tersedia.');
         }
 
+        app(AuditLogger::class)->log(
+            'report.claimed',
+            'report',
+            $report->id,
+            'Laporan diambil oleh petugas untuk dikerjakan.',
+            null,
+            ['status' => Report::STATUS_IN_PROGRESS, 'petugas_id' => $petugas->id]
+        );
+
         return back()->with('success', 'Laporan #' . $report->id . ' kini Anda kerjakan.');
     }
 
@@ -255,6 +293,8 @@ class ReportController extends Controller
         $petugas = $request->user();
         $this->authorizeCategory($petugas, $report);
 
+        $oldStatus = $report->status;
+        $oldPetugas = $report->petugas_id;
         $released = Report::whereKey($report->id)
             ->where('status', Report::STATUS_IN_PROGRESS)
             ->where('petugas_id', $petugas->id)
@@ -266,6 +306,16 @@ class ReportController extends Controller
         if ($released === 0) {
             return back()->with('error', 'Hanya petugas yang mengambil laporan yang dapat melepasnya.');
         }
+
+        $report->refresh();
+        app(AuditLogger::class)->log(
+            'report.released',
+            'report',
+            $report->id,
+            'Laporan dikembalikan ke antrean oleh petugas.',
+            ['status' => $oldStatus, 'petugas_id' => $oldPetugas],
+            ['status' => $report->status, 'petugas_id' => $report->petugas_id]
+        );
 
         return back()->with('success', 'Laporan #' . $report->id . ' dikembalikan ke antrean.');
     }
@@ -298,6 +348,20 @@ class ReportController extends Controller
             'executor_note' => $data['executor_note'],
             'status' => Report::STATUS_COMPLETED,
         ]);
+
+        app(AuditLogger::class)->log(
+            'report.completed',
+            'report',
+            $report->id,
+            'Laporan selesai dikerjakan petugas.',
+            null,
+            [
+                'status' => Report::STATUS_COMPLETED,
+                'executor_name' => $data['executor_name'],
+                'executor_note' => $data['executor_note'],
+                'petugas_id' => $petugas->id,
+            ]
+        );
 
         return back()->with('success', 'Laporan #' . $report->id . ' ditandai selesai.');
     }
@@ -335,6 +399,15 @@ class ReportController extends Controller
             'rating' => $data['rating'],
             'review' => $data['review'] ?? null,
         ]);
+
+        app(AuditLogger::class)->log(
+            'report.rated',
+            'report',
+            $report->id,
+            'Warga memberi penilaian pada laporan.',
+            null,
+            ['rating' => $data['rating'], 'review' => $data['review'] ?? null]
+        );
 
         return back()->with('success', 'Terima kasih atas penilaian Anda!');
     }

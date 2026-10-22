@@ -11,7 +11,7 @@
                 {{ $petugas ? 'Edit Petugas' : 'Tambah Petugas' }}
             </div>
             <div class="card-body">
-                <form action="{{ $petugas ? route('petugas.update', $petugas) : route('petugas.store') }}" method="POST">
+                <form action="{{ $petugas ? route('admin.petugas.update', $petugas) : route('admin.petugas.store') }}" method="POST">
                     @csrf
                     @if ($petugas)
                         @method('PUT')
@@ -70,7 +70,7 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <a href="{{ route('petugas.index') }}" class="btn btn-secondary">Batal</a>
+                        <a href="{{ route('admin.petugas.index') }}" class="btn btn-secondary">Batal</a>
                         <button type="submit" class="btn btn-primary flex-grow-1">
                             <i class="fa-solid fa-floppy-disk me-1"></i>Simpan
                         </button>

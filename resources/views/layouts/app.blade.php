@@ -74,7 +74,10 @@
                     </li>
                     @if (auth()->user()->isAdmin())
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('petugas.*') ? 'active' : '' }}" href="{{ route('petugas.index') }}">Kelola petugas</a>
+                            <a class="nav-link {{ request()->routeIs('admin.petugas.index') ? 'active' : '' }}" href="{{ route('admin.petugas.index') }}">Kelola petugas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.audit-log.index') ? 'active' : '' }}" href="{{ route('admin.audit-log.index') }}">Log aktivitas</a>
                         </li>
                     @endif
                 @endauth
