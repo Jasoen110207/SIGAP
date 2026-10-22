@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Report;
 use App\Models\User;
+use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,7 @@ class PetugasController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
-        User::create([
+        $petugas = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
@@ -58,7 +59,16 @@ class PetugasController extends Controller
             'is_active' => true,
         ]);
 
-        return redirect()->route('petugas.index')
+        app(AuditLogger::class)->log(
+            'petugas.created',
+            'petugas',
+            $petugas->id,
+            'Petugas baru dibuat.',
+            null,
+            ['name' => $petugas->name, 'email' => $petugas->email, 'category_id' => $petugas->category_id]
+        );
+
+        return redirect()->route('admin.petugas.index')
             ->with('success', 'Akun petugas "' . $data['name'] . '" berhasil dibuat.');
     }
 
@@ -84,11 +94,16 @@ class PetugasController extends Controller
             'password' => ['nullable', 'confirmed', Password::min(8)],
         ]);
 
+        $oldValues = [
+            'name' => $petugas->name,
+            'email' => $petugas->email,
+            'phone' => $petugas->phone,
+            'category_id' => $petugas->category_id,
+        ];
+
         $released = 0;
 
-        DB::transaction(function () use ($petugas, $data, &$released) {
-            // Pindah kategori: tugas yang sedang dipegang dikembalikan ke antrean
-            // kategori lama, karena petugas tidak lagi berhak mengerjakannya.
+        DB::transaction(function () use ($petugas, $data, &$released, &$oldValues) {
             if ((int) $data['category_id'] !== (int) $petugas->category_id) {
                 $released = $this->releaseHeldReports($petugas);
             }
@@ -101,30 +116,59 @@ class PetugasController extends Controller
             ]);
 
             if (! empty($data['password'])) {
+                $oldValues['password'] = 'diubah';
                 $petugas->password = Hash::make($data['password']);
             }
 
             $petugas->save();
         });
 
-        $message = 'Data petugas "' . $petugas->name . '" diperbarui.';
-        if ($released > 0) {
-            $message .= ' ' . $released . ' laporan yang dipegang dikembalikan ke antrean kategori lama.';
+        $newValues = [
+            'name' => $petugas->name,
+            'email' => $petugas->email,
+            'phone' => $petugas->phone,
+            'category_id' => $petugas->category_id,
+        ];
+
+        if (! empty($data['password'])) {
+            $newValues['password'] = 'diubah';
         }
 
-        return redirect()->route('petugas.index')->with('success', $message);
+        $changed = array_filter($newValues, fn ($value, $key) => isset($oldValues[$key]) && $oldValues[$key] !== $value, ARRAY_FILTER_USE_BOTH);
+
+        app(AuditLogger::class)->log(
+            'petugas.updated',
+            'petugas',
+            $petugas->id,
+            'Data petugas diperbarui.',
+            array_intersect_key($oldValues, $changed),
+            $changed
+        );
+
+        $message = 'Data petugas "' . $petugas->name . '" diperbarui.';
+        if ($released > 0) {
+            $message .= ' ' . $released . ' laporan yang dipegang dikembalikan ke antrean.';
+        }
+
+        return redirect()->route('admin.petugas.index')->with('success', $message);
     }
 
-    /**
-     * Mengaktifkan / menonaktifkan akun petugas.
-     * Saat dinonaktifkan, laporan yang sedang dipegang dikembalikan ke antrean.
-     */
     public function toggle(User $petugas): RedirectResponse
     {
         $this->ensurePetugas($petugas);
 
         if (! $petugas->is_active) {
+            $released = 0;
             $petugas->update(['is_active' => true]);
+
+            app(AuditLogger::class)->log(
+                'petugas.activated',
+                'petugas',
+                $petugas->id,
+                'Petugas diaktifkan kembali.',
+                ['is_active' => false],
+                ['is_active' => true, 'released_reports' => $released]
+            );
 
             return back()->with('success', 'Akun "' . $petugas->name . '" diaktifkan kembali.');
         }
@@ -135,6 +179,15 @@ class PetugasController extends Controller
             $released = $this->releaseHeldReports($petugas);
             $petugas->update(['is_active' => false]);
         });
+
+        app(AuditLogger::class)->log(
+            'petugas.deactivated',
+            'petugas',
+            $petugas->id,
+            'Petugas dinonaktifkan dan laporan dikembalikan ke antrean.',
+            ['is_active' => true],
+            ['is_active' => false, 'released_reports' => $released]
+        );
 
         $message = 'Akun "' . $petugas->name . '" dinonaktifkan.';
         if ($released > 0) {

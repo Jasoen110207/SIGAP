@@ -4,8 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Middleware\EnsureUserIsActive;
-use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
 // Publik
@@ -24,26 +24,29 @@ Route::middleware(['auth', EnsureUserIsActive::class])->group(function () {
     Route::get('/dashboard', [ReportController::class, 'index'])->name('dashboard');
 
     // Warga
-    Route::middleware(RoleMiddleware::class . ':user')->group(function () {
+    Route::middleware(['auth', 'role:user'])->group(function () {
         Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
         Route::post('/reports/{report}/rate', [ReportController::class, 'rate'])->name('reports.rate');
     });
 
     // Admin Kelurahan
-    Route::middleware(RoleMiddleware::class . ':admin')->group(function () {
+    Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::patch('/reports/{report}/verify', [ReportController::class, 'verify'])->name('reports.verify');
 
-        // Kelola akun petugas
-        Route::get('/admin/petugas', [PetugasController::class, 'index'])->name('petugas.index');
-        Route::get('/admin/petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
-        Route::post('/admin/petugas', [PetugasController::class, 'store'])->name('petugas.store');
-        Route::get('/admin/petugas/{petugas}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
-        Route::put('/admin/petugas/{petugas}', [PetugasController::class, 'update'])->name('petugas.update');
-        Route::patch('/admin/petugas/{petugas}/toggle', [PetugasController::class, 'toggle'])->name('petugas.toggle');
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
+            // Kelola akun petugas
+            Route::get('/petugas', [PetugasController::class, 'index'])->name('petugas.index');
+            Route::get('/petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
+            Route::post('/petugas', [PetugasController::class, 'store'])->name('petugas.store');
+            Route::get('/petugas/{petugas}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
+            Route::put('/petugas/{petugas}', [PetugasController::class, 'update'])->name('petugas.update');
+            Route::patch('/petugas/{petugas}/toggle', [PetugasController::class, 'toggle'])->name('petugas.toggle');
+        });
     });
 
     // Petugas Lapangan
-    Route::middleware(RoleMiddleware::class . ':petugas')->group(function () {
+    Route::middleware(['auth', 'role:petugas'])->group(function () {
         Route::patch('/reports/{report}/start', [ReportController::class, 'startWork'])->name('reports.start');
         Route::patch('/reports/{report}/release', [ReportController::class, 'releaseWork'])->name('reports.release');
         Route::post('/reports/{report}/complete', [ReportController::class, 'completeWork'])->name('reports.complete');
