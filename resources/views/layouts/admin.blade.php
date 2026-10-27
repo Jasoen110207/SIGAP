@@ -48,24 +48,15 @@
         .brand {
             display: flex;
             align-items: center;
-            gap: .8rem;
             padding: 1.25rem 1.25rem 1rem;
             border-bottom: 1px solid var(--line);
-        }
-        .brand-mark {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary), #6ea8fe);
-            color: white;
-            display: grid;
-            place-items: center;
-            font-weight: 700;
         }
         .brand-name {
             font-weight: 800;
             letter-spacing: -.03em;
             color: var(--ink);
+            font-size: 1.5rem;
+            line-height: 1.1;
         }
         .nav-group { padding: 1rem .85rem; }
         .nav-label {
@@ -228,11 +219,7 @@
     <div class="admin-shell">
         <aside class="admin-sidebar">
             <div class="brand">
-                <div class="brand-mark">S</div>
-                <div>
-                    <div class="brand-name">SIGAP</div>
-                    <small class="text-muted">Kelurahan</small>
-                </div>
+                <div class="brand-name">SIGAP</div>
             </div>
 
             <div class="nav-group">
@@ -240,19 +227,16 @@
                 <ul class="admin-nav">
                     <li>
                         <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                            <i class="fa-solid fa-gauge-high"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('admin.petugas.index') }}" class="{{ request()->routeIs('admin.petugas.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-users-gear"></i>
                             <span>Kelola Petugas</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('admin.audit-log.index') }}" class="{{ request()->routeIs('admin.audit-log.index') ? 'active' : '' }}">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
                             <span>Log Aktivitas</span>
                         </a>
                     </li>
