@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', $petugas ? 'Edit Petugas' : 'Tambah Petugas')
 
@@ -33,6 +33,13 @@
                             <input type="text" id="phone" name="phone" value="{{ old('phone', $petugas?->phone) }}"
                                    class="form-control @error('phone') is-invalid @enderror">
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="login_token" class="form-label">Token Login Petugas</label>
+                        <input type="text" id="login_token" name="login_token" value="{{ old('login_token', $petugas?->login_token) }}"
+                               class="form-control @error('login_token') is-invalid @enderror" maxlength="255"
+                               placeholder="Contoh: DRAIN-001-A">
+                        <div class="form-text">Token ini harus unik per petugas. Jika tidak diisi, petugas tidak bisa login dengan token.</div>
                     </div>
                     <div class="mb-3">
                         <label for="category_id" class="form-label">Kategori Pekerjaan</label>

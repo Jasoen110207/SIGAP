@@ -22,6 +22,13 @@
                         <input type="password" id="password" name="password"
                                class="form-control @error('password') is-invalid @enderror" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="login_token" class="form-label">Token Login Petugas</label>
+                        <input type="text" id="login_token" name="login_token" value="{{ old('login_token') }}"
+                               class="form-control @error('login_token') is-invalid @enderror"
+                               placeholder="Masukkan token unik petugas">
+                        <div class="form-text">Untuk akun petugas, token ini wajib sesuai dengan akun yang ditetapkan admin.</div>
+                    </div>
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" name="remember" id="remember">
                         <label class="form-check-label" for="remember">Ingat saya</label>

@@ -45,7 +45,7 @@ class AuditLogController extends Controller
             });
         }
 
-        $logs = $query->paginate(10)->withQueryString();
+        $logs = $query->paginate(5)->withQueryString();
 
         return view('admin.audit-log.index', compact('logs'));
     }
