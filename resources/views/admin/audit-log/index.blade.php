@@ -1,4 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('title', 'Log Aktivitas')
 
 @section('content')
 <div class="container-fluid py-4">

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Dashboard Admin')
 
@@ -54,10 +54,10 @@
         <span class="badge text-bg-warning ms-1">{{ $pendingReports->total() }}</span>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover align-middle mb-0 verification-table">
             <thead class="table-light">
                 <tr>
-                    <th>Foto</th>
+                    <th class="report-photo-cell">Foto</th>
                     <th>Laporan</th>
                     <th>Pelapor</th>
                     <th>Lokasi</th>
@@ -67,27 +67,29 @@
             <tbody>
                 @forelse ($pendingReports as $report)
                     <tr>
-                        <td>
-                            <a href="{{ $report->photo_before_url }}" target="_blank" rel="noopener">
-                                <img src="{{ $report->photo_before_url }}" class="report-thumb" alt="Foto">
+                        <td class="report-photo-cell">
+                            <a href="{{ $report->photo_before_url }}" target="_blank" rel="noopener" class="report-thumb-link">
+                                <img src="{{ $report->photo_before_url }}" class="report-thumb" alt="Foto laporan {{ $report->title }}">
                             </a>
                         </td>
-                        <td style="max-width: 320px;">
-                            <div class="fw-semibold">{{ $report->title }}</div>
-                            <span class="badge text-bg-secondary">{{ $report->category->name }}</span>
-                            <div class="small text-muted mt-1">{{ \Illuminate\Support\Str::limit($report->description, 110) }}</div>
-                            <div class="small text-muted">{{ $report->created_at->format('d M Y H:i') }}</div>
+                        <td>
+                            <div class="report-summary">
+                                <div class="fw-semibold report-title">{{ $report->title }}</div>
+                                <span class="badge text-bg-secondary align-self-start">{{ $report->category->name }}</span>
+                                <p class="report-desc mb-0">{{ \Illuminate\Support\Str::limit($report->description, 110) }}</p>
+                                <div class="small text-muted">{{ $report->created_at->format('d M Y H:i') }}</div>
+                            </div>
                         </td>
                         <td>
-                            {{ $report->user->name }}
+                            <div class="fw-medium">{{ $report->user->name }}</div>
                             @if ($report->user->phone)
                                 <div class="small text-muted">{{ $report->user->phone }}</div>
                             @endif
                         </td>
                         <td>
-                            {{ $report->location }}
+                            <div class="small fw-medium text-wrap">{{ $report->location }}</div>
                             @if ($report->latitude && $report->longitude)
-                                <div>
+                                <div class="mt-1">
                                     <a class="small" target="_blank" rel="noopener"
                                        href="https://www.google.com/maps?q={{ $report->latitude }},{{ $report->longitude }}">
                                         <i class="fa-solid fa-map-location-dot me-1"></i>Lihat peta
@@ -111,7 +113,7 @@
                                     </button>
                                 </span>
                             @endif
-                            <button type="button" class="btn btn-sm btn-danger"
+                            <button type="button" class="btn btn-sm btn-danger mt-2 mt-md-0"
                                     data-bs-toggle="modal" data-bs-target="#rejectModal"
                                     data-url="{{ route('reports.verify', $report) }}"
                                     data-title="{{ $report->title }}">

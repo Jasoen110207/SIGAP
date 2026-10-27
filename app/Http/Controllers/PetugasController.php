@@ -45,6 +45,7 @@ class PetugasController extends Controller
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'max:20'],
+            'login_token' => ['required', 'string', 'max:255', 'unique:users,login_token'],
             'category_id' => ['required', 'integer', 'exists:categories,id'],
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
@@ -53,6 +54,7 @@ class PetugasController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
+            'login_token' => $data['login_token'] ?? null,
             'category_id' => $data['category_id'],
             'password' => Hash::make($data['password']),
             'role' => User::ROLE_PETUGAS,
@@ -90,6 +92,7 @@ class PetugasController extends Controller
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150', Rule::unique('users', 'email')->ignore($petugas->id)],
             'phone' => ['nullable', 'string', 'max:20'],
+            'login_token' => ['required', 'string', 'max:255', Rule::unique('users', 'login_token')->ignore($petugas->id)],
             'category_id' => ['required', 'integer', 'exists:categories,id'],
             'password' => ['nullable', 'confirmed', Password::min(8)],
         ]);
@@ -98,6 +101,7 @@ class PetugasController extends Controller
             'name' => $petugas->name,
             'email' => $petugas->email,
             'phone' => $petugas->phone,
+            'login_token' => $petugas->login_token,
             'category_id' => $petugas->category_id,
         ];
 
@@ -112,6 +116,7 @@ class PetugasController extends Controller
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'phone' => $data['phone'] ?? null,
+                'login_token' => $data['login_token'] ?? null,
                 'category_id' => $data['category_id'],
             ]);
 
@@ -127,6 +132,7 @@ class PetugasController extends Controller
             'name' => $petugas->name,
             'email' => $petugas->email,
             'phone' => $petugas->phone,
+            'login_token' => $petugas->login_token,
             'category_id' => $petugas->category_id,
         ];
 

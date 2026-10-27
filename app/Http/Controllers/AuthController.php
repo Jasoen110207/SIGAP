@@ -27,18 +27,39 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
+            'login_token' => ['nullable', 'string', 'max:255'],
         ]);
 
         $emailAttempt = mb_substr((string) $credentials['email'], 0, 150);
+        $tokenAttempt = mb_substr((string) ($credentials['login_token'] ?? ''), 0, 255);
+
+        $user = User::where('email', $credentials['email'])->first();
+
+        if ($user && $user->role === User::ROLE_PETUGAS && ! empty($credentials['login_token'])) {
+            if ($user->login_token !== $credentials['login_token']) {
+                app(AuditLogger::class)->log(
+                    'auth.login_failed',
+                    'user',
+                    $user->id,
+                    'Login petugas gagal karena token tidak sesuai.',
+                    null,
+                    ['email' => $emailAttempt, 'login_token' => $tokenAttempt, 'ip_address' => $request->ip()]
+                );
+
+                return back()
+                    ->withErrors(['login_token' => 'Token login petugas tidak valid untuk akun ini.'])
+                    ->onlyInput('email');
+            }
+        }
 
         if (! Auth::attempt($credentials + ['is_active' => true], $request->boolean('remember'))) {
             app(AuditLogger::class)->log(
                 'auth.login_failed',
                 'user',
-                null,
+                $user?->id,
                 'Login gagal untuk email yang dicoba.',
                 null,
-                ['email' => $emailAttempt, 'ip_address' => $request->ip()]
+                ['email' => $emailAttempt, 'login_token' => $tokenAttempt, 'ip_address' => $request->ip()]
             );
 
             return back()
@@ -49,6 +70,10 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
+        if ($user && $user->role === User::ROLE_PETUGAS && empty($user->login_token)) {
+            return back()->withErrors(['login_token' => 'Akun petugas belum memiliki token login yang aktif.']);
+        }
+
         app(AuditLogger::class)->log(
             'auth.login',
             'user',
