@@ -31,7 +31,13 @@ class EnsureUserIsActive
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')
+            $loginRoute = match ($user->role) {
+                'petugas' => 'petugas.login',
+                'admin' => 'admin.login',
+                default => 'login',
+            };
+
+            return redirect()->route($loginRoute)
                 ->withErrors(['email' => 'Akun Anda dinonaktifkan. Hubungi admin kelurahan.']);
         }
 

@@ -43,6 +43,31 @@
         .site-nav .nav-link.active { color: var(--ink); }
         .site-nav .nav-link.active { font-weight: 600; }
 
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            margin-right: .5rem;
+            padding: .4rem .8rem;
+            border-radius: 999px;
+            text-decoration: none;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .brand-logo:hover {
+            transform: translateY(-1px);
+            text-decoration: none;
+        }
+        .brand-word {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            line-height: 1;
+            background: linear-gradient(135deg, #1f5fbf 0%, #2d9cdb 35%, #1d4ed8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 8px 20px rgba(31, 95, 191, 0.18);
+        }
+
         .stat-card { border: 0; box-shadow: 0 2px 10px rgba(0, 0, 0, .06); }
         .report-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: .5rem; }
         .photo-cover { width: 100%; height: 180px; object-fit: cover; }
@@ -52,13 +77,21 @@
             position: absolute; top: .5rem; left: .5rem;
             font-size: .7rem; font-weight: 600;
         }
+        @media (max-width: 991.98px) {
+            .brand-word {
+                letter-spacing: 0.08em;
+                font-size: 1.15rem;
+            }
+        }
     </style>
     @stack('styles')
 </head>
 <body>
 <nav class="navbar navbar-expand-lg bg-white border-bottom site-nav">
     <div class="container">
-        <a class="navbar-brand fw-bold text-primary" href="{{ route('landing') }}">SIGAP</a>
+        <a class="navbar-brand brand-logo" href="{{ route('landing') }}">
+            <span class="brand-word">SIGAP</span>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
                 aria-controls="mainNav" aria-expanded="false" aria-label="Buka menu">
             <span class="navbar-toggler-icon"></span>

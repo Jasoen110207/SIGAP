@@ -1,8 +1,20 @@
-@extends('layouts.app')
+@extends('layouts.warga')
 
 @section('title', 'Dashboard Warga')
 
 @section('content')
+@section('content')
+@php
+    $statusStyles = [
+        'warning' => ['class' => 'text-bg-warning', 'progress' => 'bg-warning'],
+        'info' => ['class' => 'text-bg-info', 'progress' => 'bg-info'],
+        'primary' => ['class' => 'text-bg-primary', 'progress' => 'bg-primary'],
+        'success' => ['class' => 'text-bg-success', 'progress' => 'bg-success'],
+        'danger' => ['class' => 'text-bg-danger', 'progress' => 'bg-danger'],
+        'secondary' => ['class' => 'text-bg-secondary', 'progress' => 'bg-secondary'],
+    ];
+@endphp
+<div class="row g-4">
 <div class="row g-4">
     {{-- Form Lapor --}}
     <div class="col-lg-4">
@@ -74,7 +86,7 @@
                         <tr>
                             <th>Foto</th>
                             <th>Laporan</th>
-                            <th style="min-width: 170px;">Status</th>
+                            <th style="min-width: 240px;">Status</th>
                             <th class="text-end">Aksi</th>
                         </tr>
                     </thead>
@@ -84,6 +96,15 @@
                                 $stepKeys = ['pending', 'validated', 'in_progress', 'completed'];
                                 $stepIndex = array_search($report->status, $stepKeys, true);
                                 $progress = $stepIndex === false ? 0 : (($stepIndex + 1) / count($stepKeys)) * 100;
+                                $statusMeta = $statusStyles[$report->status_badge] ?? $statusStyles['secondary'];
+                                $progressColor = match ($report->status_badge) {
+                                    'warning' => '#f59e0b',
+                                    'info' => '#0dcaf0',
+                                    'primary' => '#0d6efd',
+                                    'success' => '#198754',
+                                    'danger' => '#dc3545',
+                                    default => '#6c757d',
+                                };
                             @endphp
                             <tr>
                                 <td><img src="{{ $report->photo_before_url }}" class="report-thumb" alt="Foto"></td>
@@ -94,10 +115,18 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge text-bg-{{ $report->status_badge }}">{{ $report->status_label }}</span>
+                                    <span class="badge {{ $statusMeta['class'] }}">{{ $report->status_label }}</span>
                                     @if ($report->status !== 'rejected')
                                         <div class="progress mt-2" style="height: 6px;" title="{{ $report->status_label }}">
-                                            <div class="progress-bar bg-{{ $report->status_badge }}" style="width: {{ $progress }}%"></div>
+                                            <div class="progress-bar" @style(['width: '.$progress.'%', 'background-color: '.$progressColor])></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-2 small">
+                                            @foreach (['Dikirim', 'Divalidasi', 'Dikerjakan', 'Selesai'] as $index => $phase)
+                                                @php
+                                                    $isActive = $index <= $stepIndex;
+                                                @endphp
+                                                <span class="{{ $isActive ? 'fw-semibold text-dark' : 'text-muted' }}">{{ $phase }}</span>
+                                            @endforeach
                                         </div>
                                     @endif
                                     @if ($report->status === 'completed' && $report->rating)
@@ -139,13 +168,16 @@
 
 {{-- Modal Detail + Tracking + Rating --}}
 @foreach ($reports as $report)
+    @php
+        $modalStatusMeta = $statusStyles[$report->status_badge] ?? $statusStyles['secondary'];
+    @endphp
     <div class="modal fade" id="detail-{{ $report->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <div>
                         <h5 class="modal-title">{{ $report->title }}</h5>
-                        <span class="badge text-bg-{{ $report->status_badge }}">{{ $report->status_label }}</span>
+                        <span class="badge {{ $modalStatusMeta['class'] }}">{{ $report->status_label }}</span>
                         <span class="badge text-bg-secondary">{{ $report->category->name }}</span>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
