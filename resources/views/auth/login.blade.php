@@ -39,6 +39,9 @@
                 </form>
 
                 <hr>
+                <p class="text-center small mb-2">
+                    <a href="{{ route('password.request') }}">Lupa password?</a>
+                </p>
                 <p class="text-center small mb-0">
                     Belum punya akun? <a href="{{ route('register') }}">Daftar sebagai warga</a>
                 </p>
