@@ -1,51 +1,47 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('title', 'Ganti Password')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="card stat-card">
-            <div class="card-body p-4">
-                <h4 class="fw-bold mb-1">Ganti Password</h4>
-                <p class="text-muted small mb-4">Password Anda sudah melewati masa berlaku demo. Silakan buat password baru yang aman.</p>
+<div class="card auth-card">
+    <div class="card-body">
+        <h4 class="fw-bold mb-1">Ganti Password</h4>
+        <p class="text-muted small mb-4">Password Anda sudah melewati masa berlaku demo. Silakan buat password baru yang aman.</p>
 
-                <form action="{{ route('password.change.store') }}" method="POST">
-                    @csrf
+        <form action="{{ route('password.change.store') }}" method="POST">
+            @csrf
 
-                    <div class="mb-3">
-                        <label for="current_password" class="form-label">Password Saat Ini</label>
-                        <input type="password" id="current_password" name="current_password"
-                               class="form-control @error('current_password') is-invalid @enderror" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password Baru</label>
-                        <input type="password" id="password" name="password"
-                               class="form-control @error('password') is-invalid @enderror" required>
-                        <div class="form-text">Minimal 8 karakter, kombinasi huruf besar, huruf kecil, angka, dan simbol.</div>
-                        <div id="password-strength" class="small mt-2 text-muted">Kekuatan password: belum dicek.</div>
-                        <ul class="small mt-2 mb-0 ps-3 text-muted">
-                            <li data-rule="length">Panjang minimal 8 karakter</li>
-                            <li data-rule="uppercase">Minimal 1 huruf besar</li>
-                            <li data-rule="number">Minimal 1 angka</li>
-                            <li data-rule="symbol">Minimal 1 simbol</li>
-                        </ul>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
-                        <input type="password" id="password_confirmation" name="password_confirmation"
-                               class="form-control" required>
-                        <div id="password-match" class="small mt-2 text-muted">Belum ada konfirmasi.</div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fa-solid fa-key me-1"></i>Ubah Password
-                    </button>
-                </form>
+            <div class="mb-3">
+                <label for="current_password" class="form-label">Password Saat Ini</label>
+                <input type="password" id="current_password" name="current_password"
+                       class="form-control @error('current_password') is-invalid @enderror" required>
             </div>
-        </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password Baru</label>
+                <input type="password" id="password" name="password"
+                       class="form-control @error('password') is-invalid @enderror" required>
+                <div class="form-text">Minimal 8 karakter, kombinasi huruf besar, huruf kecil, angka, dan simbol.</div>
+                <div id="password-strength" class="small mt-2 text-muted">Kekuatan password: belum dicek.</div>
+                <ul class="small mt-2 mb-0 ps-3 text-muted">
+                    <li data-rule="length">Panjang minimal 8 karakter</li>
+                    <li data-rule="uppercase">Minimal 1 huruf besar</li>
+                    <li data-rule="number">Minimal 1 angka</li>
+                    <li data-rule="symbol">Minimal 1 simbol</li>
+                </ul>
+            </div>
+
+            <div class="mb-3">
+                <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                <input type="password" id="password_confirmation" name="password_confirmation"
+                       class="form-control" required>
+                <div id="password-match" class="small mt-2 text-muted">Belum ada konfirmasi.</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fa-solid fa-key me-1"></i>Ubah Password
+            </button>
+        </form>
     </div>
 </div>
 @endsection

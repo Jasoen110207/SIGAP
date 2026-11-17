@@ -3,7 +3,6 @@
 @section('title', 'Dashboard Warga')
 
 @section('content')
-@section('content')
 @php
     $statusStyles = [
         'warning' => ['class' => 'text-bg-warning', 'progress' => 'bg-warning'],
@@ -13,14 +12,22 @@
         'danger' => ['class' => 'text-bg-danger', 'progress' => 'bg-danger'],
         'secondary' => ['class' => 'text-bg-secondary', 'progress' => 'bg-secondary'],
     ];
+
+    $statusTabs = [
+        'semua' => 'Semua',
+        'verifikasi' => 'Verifikasi',
+        'proses' => 'Proses',
+        'selesai' => 'Selesai',
+        'ditolak' => 'Ditolak',
+    ];
+
+    $stepLabels = ['Dikirim', 'Divalidasi', 'Dikerjakan', 'Selesai'];
 @endphp
 <div class="row g-4">
-<div class="row g-4">
-    {{-- Form Lapor --}}
     <div class="col-lg-4">
-        <div class="card stat-card">
-            <div class="card-header bg-primary text-white fw-bold">
-                <i class="fa-solid fa-pen-to-square me-1"></i>Buat Laporan Baru
+        <div class="card stat-card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-[#0F294A] text-white px-6 py-4 rounded-t-2xl border-0 fw-bold">
+                <i class="fa-solid fa-pen-to-square me-2"></i>Buat Laporan Baru
             </div>
             <div class="card-body">
                 <form action="{{ route('reports.store') }}" method="POST" enctype="multipart/form-data">
@@ -66,7 +73,7 @@
                                class="form-control @error('photo_before') is-invalid @enderror" required>
                         <div class="form-text">JPG/PNG/WEBP, maksimal 4 MB.</div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">
+                    <button type="submit" class="btn btn-primary w-100 bg-[#0F294A] hover:bg-[#1E3A5F] border-0">
                         <i class="fa-solid fa-paper-plane me-1"></i>Kirim Laporan
                     </button>
                 </form>
@@ -74,92 +81,119 @@
         </div>
     </div>
 
-    {{-- Laporanku --}}
     <div class="col-lg-8">
-        <div class="card stat-card">
-            <div class="card-header bg-white fw-bold">
-                <i class="fa-solid fa-list-check me-1 text-primary"></i>Laporanku
+        <div class="card stat-card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-white fw-bold border-0 px-4 py-3">
+                <i class="fa-solid fa-list-check me-2 text-[#0F294A]"></i>Laporanku
             </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Foto</th>
-                            <th>Laporan</th>
-                            <th style="min-width: 240px;">Status</th>
-                            <th class="text-end">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($reports as $report)
-                            @php
-                                $stepKeys = ['pending', 'validated', 'in_progress', 'completed'];
-                                $stepIndex = array_search($report->status, $stepKeys, true);
-                                $progress = $stepIndex === false ? 0 : (($stepIndex + 1) / count($stepKeys)) * 100;
-                                $statusMeta = $statusStyles[$report->status_badge] ?? $statusStyles['secondary'];
-                                $progressColor = match ($report->status_badge) {
-                                    'warning' => '#f59e0b',
-                                    'info' => '#0dcaf0',
-                                    'primary' => '#0d6efd',
-                                    'success' => '#198754',
-                                    'danger' => '#dc3545',
-                                    default => '#6c757d',
-                                };
-                            @endphp
-                            <tr>
-                                <td><img src="{{ $report->photo_before_url }}" class="report-thumb" alt="Foto"></td>
-                                <td>
-                                    <div class="fw-semibold">{{ $report->title }}</div>
-                                    <div class="small text-muted">
-                                        {{ $report->category->name }} &middot; {{ $report->created_at->format('d M Y H:i') }}
+
+            <div class="px-4 pb-3">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    @foreach ($statusTabs as $value => $label)
+                        @php
+                            $isActive = $selectedStatus === $value;
+                            $count = $tabCounts[$value] ?? 0;
+                        @endphp
+                        <a href="{{ route('dashboard', ['status' => $value]) }}"
+                           class="btn btn-sm d-inline-flex align-items-center gap-2 rounded-pill {{ $isActive ? 'bg-[#0F294A] text-white' : 'btn-outline-secondary text-secondary' }}">
+                            <span>{{ $label }}</span>
+                            <span class="badge rounded-pill {{ $isActive ? 'bg-white text-[#0F294A]' : 'bg-secondary-subtle text-secondary' }}">
+                                {{ $count }}
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="px-4 pb-4">
+                <div class="d-flex flex-column gap-4">
+                    @forelse ($reports as $report)
+                        @php
+                            $stepKeys = ['pending', 'validated', 'in_progress', 'completed'];
+                            $stepIndex = array_search($report->status, $stepKeys, true);
+                            $progress = $stepIndex === false ? 0 : (($stepIndex + 1) / count($stepKeys)) * 100;
+                            $statusMeta = $statusStyles[$report->status_badge] ?? $statusStyles['secondary'];
+                            $progressColor = match ($report->status_badge) {
+                                'warning' => '#f59e0b',
+                                'info' => '#0dcaf0',
+                                'primary' => '#0d6efd',
+                                'success' => '#198754',
+                                'danger' => '#dc3545',
+                                default => '#6c757d',
+                            };
+                        @endphp
+
+                        <div class="card border-0 shadow-sm rounded-3 p-3 bg-light-subtle">
+                            <div class="d-flex gap-3 align-items-start justify-content-between">
+                                <div class="d-flex gap-3 align-items-center flex-grow-1 min-w-0">
+                                    <img src="{{ $report->photo_before_url }}" class="w-16 h-16 rounded-xl object-fit-cover shadow-sm flex-shrink-0" alt="Foto laporan" style="width: 4rem; height: 4rem; object-fit: cover;">
+
+                                    <div class="min-w-0 flex-grow-1">
+                                        <div class="fw-bold text-dark text-truncate">{{ $report->title }}</div>
+                                        <div class="small text-muted d-flex flex-wrap gap-2 mt-1">
+                                            <span>{{ $report->category->name }}</span>
+                                            <span>&middot;</span>
+                                            <span>{{ $report->created_at->format('d M Y H:i') }}</span>
+                                        </div>
                                     </div>
-                                </td>
-                                <td>
-                                    <span class="badge {{ $statusMeta['class'] }}">{{ $report->status_label }}</span>
-                                    @if ($report->status !== 'rejected')
-                                        <div class="progress mt-2" style="height: 6px;" title="{{ $report->status_label }}">
-                                            <div class="progress-bar" @style(['width: '.$progress.'%', 'background-color: '.$progressColor])></div>
-                                        </div>
-                                        <div class="d-flex justify-content-between mt-2 small">
-                                            @foreach (['Dikirim', 'Divalidasi', 'Dikerjakan', 'Selesai'] as $index => $phase)
-                                                @php
-                                                    $isActive = $index <= $stepIndex;
-                                                @endphp
-                                                <span class="{{ $isActive ? 'fw-semibold text-dark' : 'text-muted' }}">{{ $phase }}</span>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                    @if ($report->status === 'completed' && $report->rating)
-                                        <div class="mt-1 small">@include('partials.stars', ['value' => $report->rating])</div>
-                                    @endif
-                                </td>
-                                <td class="text-end">
-                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                            data-bs-toggle="modal" data-bs-target="#detail-{{ $report->id }}">
-                                        <i class="fa-solid fa-eye me-1"></i>Detail
-                                    </button>
-                                    @if ($report->status === 'completed' && $report->rating === null)
-                                        <button type="button" class="btn btn-sm btn-warning"
+                                </div>
+
+                                <div class="d-flex flex-column align-items-end gap-2 flex-shrink-0">
+                                    <span class="badge {{ $statusMeta['class'] }} rounded-pill">{{ $report->status_label }}</span>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-sm btn-outline-primary"
                                                 data-bs-toggle="modal" data-bs-target="#detail-{{ $report->id }}">
-                                            <i class="fa-solid fa-star me-1"></i>Beri Rating
+                                            <i class="fa-solid fa-eye me-1"></i>Detail
                                         </button>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center text-muted py-5">
-                                    <i class="fa-regular fa-folder-open fa-2x d-block mb-2"></i>
-                                    Anda belum membuat laporan.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                        @if ($report->status === 'completed' && $report->rating === null)
+                                            <button type="button" class="btn btn-sm btn-warning"
+                                                    data-bs-toggle="modal" data-bs-target="#detail-{{ $report->id }}">
+                                                <i class="fa-solid fa-star me-1"></i>Beri Rating
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                @if ($report->status !== 'rejected')
+                                    <div class="progress mb-2" role="progressbar" aria-label="Progress laporan" style="height: 8px;">
+                                        <div class="progress-bar" style="width: {{ $progress }}%; background-color: {{ $progressColor }};"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between gap-2 text-xs text-muted w-100">
+                                        @foreach ($stepLabels as $index => $label)
+                                            @php $isActive = $index <= ($stepIndex === false ? -1 : $stepIndex); @endphp
+                                            <span class="text-center flex-fill text-nowrap {{ $isActive ? 'text-dark fw-semibold' : 'text-muted' }}">
+                                                {{ $label }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                @if ($report->status === 'completed' && $report->rating)
+                                    <div class="mt-2 small text-muted">
+                                        @include('partials.stars', ['value' => $report->rating])
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center text-muted py-5">
+                            <i class="fa-regular fa-folder-open fa-2x d-block mb-2"></i>
+                            Tidak ada laporan pada kategori ini.
+                        </div>
+                    @endforelse
+                </div>
             </div>
+
             @if ($reports->hasPages())
-                <div class="card-footer bg-white">
-                    {{ $reports->links('pagination::bootstrap-5') }}
+                <div class="card-footer bg-white border-0 px-4 pb-3 pt-0">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                        <small class="text-muted">
+                            Showing {{ $reports->firstItem() }} to {{ $reports->lastItem() }} of {{ $reports->total() }} results
+                        </small>
+                        <div>{{ $reports->links('pagination::bootstrap-5') }}</div>
+                    </div>
                 </div>
             @endif
         </div>

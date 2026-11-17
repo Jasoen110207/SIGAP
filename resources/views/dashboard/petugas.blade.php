@@ -5,6 +5,9 @@
 @section('content')
 @php
     $activeTab = request('tab', 'tugas-saya');
+    if ($activeTab === 'tugas-saya' && (request()->has('riwayat_page') || request()->has('page'))) {
+        $activeTab = 'riwayat-selesai';
+    }
     $allowedTabs = ['tugas-saya', 'antrean-kategori', 'riwayat-selesai'];
     if (! in_array($activeTab, $allowedTabs, true)) {
         $activeTab = 'tugas-saya';
@@ -113,12 +116,6 @@
             </div>
         </div>
 
-        @php
-            $historyItems = $completedReports->items();
-            $historyCount = count($historyItems);
-            $hiddenHistoryCount = max(0, $historyCount - 3);
-        @endphp
-
         <div class="tab-panel" data-tab-panel="riwayat-selesai" @if ($activeTab !== 'riwayat-selesai') hidden @endif>
             <div class="petugas-summary-row">
                 <h5 class="fw-bold mb-0">
@@ -128,38 +125,36 @@
             </div>
 
             <div class="row g-4">
-                @forelse ($historyItems as $report)
-                    @if ($loop->index < 3)
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card stat-card h-100 border-top border-4 border-success">
-                                <div class="row g-0">
-                                    <div class="col-6 position-relative">
-                                        <span class="badge text-bg-danger label-chip">SEBELUM</span>
-                                        <img src="{{ $report->photo_before_url }}" class="photo-compare" alt="Foto sebelum">
-                                    </div>
-                                    <div class="col-6 position-relative">
-                                        <span class="badge text-bg-success label-chip">SESUDAH</span>
-                                        <img src="{{ $report->photo_after_url }}" class="photo-compare" alt="Foto sesudah">
-                                    </div>
+                @forelse ($completedReports as $report)
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card stat-card h-100 border-top border-4 border-success">
+                            <div class="row g-0">
+                                <div class="col-6 position-relative">
+                                    <span class="badge text-bg-danger label-chip">SEBELUM</span>
+                                    <img src="{{ $report->photo_before_url }}" class="photo-compare" alt="Foto sebelum">
                                 </div>
-                                <div class="card-body">
-                                    <h6 class="fw-bold">{{ $report->title }}</h6>
-                                    <p class="small text-muted mb-1"><i class="fa-solid fa-location-dot me-1"></i>{{ $report->location }}</p>
-                                    <p class="small mb-1"><strong>Eksekutor:</strong> {{ $report->executor_name }}</p>
-                                    <p class="small mb-2">{{ \Illuminate\Support\Str::limit($report->executor_note, 100) }}</p>
-                                    <div class="small text-muted">
-                                        Selesai {{ $report->updated_at->format('d M Y H:i') }}
-                                        @if ($report->petugas)
-                                            &middot; oleh {{ $report->petugas->name }}
-                                        @endif
-                                    </div>
-                                    @if ($report->rating)
-                                        <div class="mt-1">@include('partials.stars', ['value' => $report->rating])</div>
-                                    @endif
+                                <div class="col-6 position-relative">
+                                    <span class="badge text-bg-success label-chip">SESUDAH</span>
+                                    <img src="{{ $report->photo_after_url }}" class="photo-compare" alt="Foto sesudah">
                                 </div>
                             </div>
+                            <div class="card-body">
+                                <h6 class="fw-bold">{{ $report->title }}</h6>
+                                <p class="small text-muted mb-1"><i class="fa-solid fa-location-dot me-1"></i>{{ $report->location }}</p>
+                                <p class="small mb-1"><strong>Eksekutor:</strong> {{ $report->executor_name }}</p>
+                                <p class="small mb-2">{{ \Illuminate\Support\Str::limit($report->executor_note, 100) }}</p>
+                                <div class="small text-muted">
+                                    Selesai {{ $report->updated_at->format('d M Y H:i') }}
+                                    @if ($report->petugas)
+                                        &middot; oleh {{ $report->petugas->name }}
+                                    @endif
+                                </div>
+                                @if ($report->rating)
+                                    <div class="mt-1">@include('partials.stars', ['value' => $report->rating])</div>
+                                @endif
+                            </div>
                         </div>
-                    @endif
+                    </div>
                 @empty
                     <div class="col-12">
                         <div class="alert alert-light border mb-0 text-center">Belum ada laporan yang diselesaikan.</div>
@@ -167,57 +162,11 @@
                 @endforelse
             </div>
 
-            @if ($historyCount > 3)
-                <div class="mt-4 history-container">
-                    <button type="button" class="btn btn-outline-secondary w-100 history-toggle" data-target="history-more-panel" aria-expanded="false">
-                        <span class="d-flex align-items-center justify-content-center gap-2">
-                            <span class="history-toggle-label">Lihat Sisa Riwayat Selesai ({{ $hiddenHistoryCount }} laporan lainnya)</span>
-                            <i class="fa-solid fa-chevron-down history-chevron"></i>
-                        </span>
-                    </button>
-
-                    <div id="history-more-panel" class="mt-4" hidden>
-                        <div class="row g-4">
-                            @foreach ($historyItems as $report)
-                                @if ($loop->index >= 3)
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="card stat-card h-100 border-top border-4 border-success">
-                                            <div class="row g-0">
-                                                <div class="col-6 position-relative">
-                                                    <span class="badge text-bg-danger label-chip">SEBELUM</span>
-                                                    <img src="{{ $report->photo_before_url }}" class="photo-compare" alt="Foto sebelum">
-                                                </div>
-                                                <div class="col-6 position-relative">
-                                                    <span class="badge text-bg-success label-chip">SESUDAH</span>
-                                                    <img src="{{ $report->photo_after_url }}" class="photo-compare" alt="Foto sesudah">
-                                                </div>
-                                            </div>
-                                            <div class="card-body">
-                                                <h6 class="fw-bold">{{ $report->title }}</h6>
-                                                <p class="small text-muted mb-1"><i class="fa-solid fa-location-dot me-1"></i>{{ $report->location }}</p>
-                                                <p class="small mb-1"><strong>Eksekutor:</strong> {{ $report->executor_name }}</p>
-                                                <p class="small mb-2">{{ \Illuminate\Support\Str::limit($report->executor_note, 100) }}</p>
-                                                <div class="small text-muted">
-                                                    Selesai {{ $report->updated_at->format('d M Y H:i') }}
-                                                    @if ($report->petugas)
-                                                        &middot; oleh {{ $report->petugas->name }}
-                                                    @endif
-                                                </div>
-                                                @if ($report->rating)
-                                                    <div class="mt-1">@include('partials.stars', ['value' => $report->rating])</div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            @endif
-
             @if ($completedReports->hasPages())
-                <div class="mt-4">
+                <div class="mt-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div class="small text-muted">
+                        Showing {{ $completedReports->firstItem() }} to {{ $completedReports->lastItem() }} of {{ $completedReports->total() }} results
+                    </div>
                     {{ $completedReports->links('pagination::bootstrap-5') }}
                 </div>
             @endif
@@ -261,15 +210,6 @@
 @endsection
 
 @push('scripts')
-<style>
-    .history-toggle .history-chevron {
-        transition: transform 0.2s ease;
-    }
-
-    .history-toggle[aria-expanded="true"] .history-chevron {
-        transform: rotate(180deg);
-    }
-</style>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const buttons = Array.from(document.querySelectorAll('[data-tab]'));
@@ -312,27 +252,5 @@
             completeModal.querySelector('.js-title').textContent = button.dataset.title;
         });
     }
-
-    document.addEventListener('click', function (event) {
-        const toggleButton = event.target.closest('.history-toggle');
-        if (!toggleButton) {
-            return;
-        }
-
-        const targetId = toggleButton.dataset.target;
-        const targetPanel = document.getElementById(targetId);
-        if (!targetPanel) {
-            return;
-        }
-
-        const isHidden = targetPanel.hasAttribute('hidden');
-        targetPanel.toggleAttribute('hidden');
-        toggleButton.setAttribute('aria-expanded', String(!isHidden));
-
-        const label = toggleButton.querySelector('.history-toggle-label');
-        if (label) {
-            label.textContent = !isHidden ? 'Sembunyikan Riwayat Lainnya' : 'Lihat Sisa Riwayat Selesai (' + (targetPanel.querySelectorAll('.card').length || 0) + ' laporan lainnya)';
-        }
-    });
 </script>
 @endpush

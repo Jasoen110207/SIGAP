@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -35,4 +34,8 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'token' => env('WA_GATEWAY_TOKEN'),
+        'url' => env('WA_GATEWAY_URL', 'https://api.fonnte.com/send'),
+    ],
 ];

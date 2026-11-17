@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Report;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\WhatsAppService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,13 +29,45 @@ class ReportController extends Controller
     private function wargaDashboard(Request $request): View
     {
         $categories = Category::orderBy('name')->get();
+        $selectedStatus = $request->query('status', 'semua');
+        $validStatuses = ['semua', 'verifikasi', 'proses', 'selesai', 'ditolak'];
 
-        $reports = Report::with('category')
-            ->where('user_id', $request->user()->id)
+        if (! in_array($selectedStatus, $validStatuses, true)) {
+            $selectedStatus = 'semua';
+        }
+
+        $reportsQuery = Report::with('category')
+            ->where('user_id', $request->user()->id);
+
+        if ($selectedStatus === 'verifikasi') {
+            $reportsQuery->where('status', Report::STATUS_PENDING);
+        } elseif ($selectedStatus === 'proses') {
+            $reportsQuery->whereIn('status', [Report::STATUS_VALIDATED, Report::STATUS_IN_PROGRESS]);
+        } elseif ($selectedStatus === 'selesai') {
+            $reportsQuery->where('status', Report::STATUS_COMPLETED);
+        } elseif ($selectedStatus === 'ditolak') {
+            $reportsQuery->where('status', Report::STATUS_REJECTED);
+        }
+
+        $reports = $reportsQuery
             ->latest()
-            ->paginate(10);
+            ->paginate(4)
+            ->withQueryString();
 
-        return view('dashboard.warga', compact('categories', 'reports'));
+        $statusCounts = Report::where('user_id', $request->user()->id)
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $tabCounts = [
+            'semua' => (int) Report::where('user_id', $request->user()->id)->count(),
+            'verifikasi' => (int) ($statusCounts[Report::STATUS_PENDING] ?? 0),
+            'proses' => (int) (($statusCounts[Report::STATUS_VALIDATED] ?? 0) + ($statusCounts[Report::STATUS_IN_PROGRESS] ?? 0)),
+            'selesai' => (int) ($statusCounts[Report::STATUS_COMPLETED] ?? 0),
+            'ditolak' => (int) ($statusCounts[Report::STATUS_REJECTED] ?? 0),
+        ];
+
+        return view('dashboard.warga', compact('categories', 'reports', 'selectedStatus', 'tabCounts'));
     }
 
     private function adminDashboard(): View
@@ -130,7 +163,8 @@ class ReportController extends Controller
             ->where('category_id', $category->id)
             ->where('status', Report::STATUS_COMPLETED)
             ->latest('updated_at')
-            ->paginate(9);
+            ->paginate(3, ['*'], 'riwayat_page')
+            ->withQueryString();
 
         $completedToday = Report::where('category_id', $category->id)
             ->where('status', Report::STATUS_COMPLETED)
@@ -167,6 +201,11 @@ class ReportController extends Controller
         $data['status'] = Report::STATUS_PENDING;
 
         $report = Report::create($data);
+
+        $user = $request->user();
+        $categoryName = $report->category?->name ?? 'kategori terkait';
+        $message = "*SIGAP*\n\nLaporan *{$report->title}* pada kategori *{$categoryName}* telah diterima dengan nomor tiket *#{$report->id}*.\n\nStatus saat ini: *Menunggu Verifikasi Admin*.\nTerima kasih atas partisipasi Anda dalam menjaga lingkungan.";
+        WhatsAppService::sendMessage($user?->phone, $message);
 
         app(AuditLogger::class)->log(
             'report.created',
@@ -220,6 +259,19 @@ class ReportController extends Controller
                 'rejection_note' => null,
             ]);
 
+            $userMessage = "*SIGAP*\n\nLaporan *{$report->title}* telah *diverifikasi* dan diteruskan ke petugas lapangan untuk penanganan lebih lanjut.\n\nStatus saat ini: *Menunggu Petugas*.\nSilakan tunggu informasi terbaru dari tim SIGAP.";
+            WhatsAppService::sendMessage($report->user?->phone, $userMessage);
+
+            $petugasList = User::where('role', User::ROLE_PETUGAS)
+                ->where('category_id', $report->category_id)
+                ->where('is_active', true)
+                ->get();
+
+            foreach ($petugasList as $petugas) {
+                $petugasMessage = "*Tugas Baru SIGAP*\n\nAda laporan baru dengan judul *{$report->title}* pada kategori *{$report->category->name}*.\n\nLokasi: *{$report->location}*\nStatus: *Menunggu diambil petugas*\n\nSilakan cek antrean tugas di dashboard SIGAP.";
+                WhatsAppService::sendMessage($petugas->phone, $petugasMessage);
+            }
+
             app(AuditLogger::class)->log(
                 'report.validated',
                 'report',
@@ -238,6 +290,9 @@ class ReportController extends Controller
             'status' => Report::STATUS_REJECTED,
             'rejection_note' => $data['rejection_note'],
         ]);
+
+        $rejectMessage = "*SIGAP*\n\nLaporan *{$report->title}* saat ini *ditolak* oleh Admin.\n\nAlasan: *{$data['rejection_note']}*\n\nSilakan periksa detail laporan Anda dan ajukan kembali jika diperlukan.";
+        WhatsAppService::sendMessage($report->user?->phone, $rejectMessage);
 
         app(AuditLogger::class)->log(
             'report.rejected',
@@ -272,6 +327,9 @@ class ReportController extends Controller
         if ($claimed === 0) {
             return back()->with('error', 'Laporan ini sudah diambil petugas lain atau tidak tersedia.');
         }
+
+        $message = "*SIGAP*\n\nLaporan *{$report->title}* sedang dalam proses pengerjaan oleh petugas *{$petugas->name}*.\n\nStatus saat ini: *Sedang Dikerjakan*.\nMohon menunggu hasil pengerjaan dari tim SIGAP.";
+        WhatsAppService::sendMessage($report->user?->phone, $message);
 
         app(AuditLogger::class)->log(
             'report.claimed',
@@ -348,6 +406,9 @@ class ReportController extends Controller
             'executor_note' => $data['executor_note'],
             'status' => Report::STATUS_COMPLETED,
         ]);
+
+        $message = "*SIGAP*\n\nLaporan *{$report->title}* telah *SELESAI* dikerjakan.\n\nSilakan buka dashboard SIGAP untuk melihat bukti foto hasil pengerjaan dan memberikan rating atas pelayanan yang telah diberikan.\n\nLink: *http://localhost:8000/dashboard*";
+        WhatsAppService::sendMessage($report->user?->phone, $message);
 
         app(AuditLogger::class)->log(
             'report.completed',
