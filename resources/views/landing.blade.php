@@ -7,6 +7,16 @@
     :root {
         --hero-overlay: rgba(11, 27, 34, 0.42);
         --hero-shadow: rgba(7, 18, 24, 0.28);
+        --navy-900: #1E3A5F;
+        --navy-800: #162C49;
+        --slate-50: #f8fafc;
+        --slate-100: #f1f5f9;
+        --slate-200: #e2e8f0;
+        --slate-300: #cbd5e1;
+        --slate-600: #475569;
+        --slate-700: #334155;
+        --amber-500: #f59e0b;
+        --amber-600: #d97706;
     }
 
     .lp-hero {
@@ -17,7 +27,7 @@
         margin-left: calc(50% - 50vw);
         margin-right: calc(50% - 50vw);
         overflow: hidden;
-        background: #0e3b3d;
+        background: #0f172a;
         border-radius: 0;
         box-shadow: none;
         isolation: isolate;
@@ -53,8 +63,8 @@
     .lp-hero-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(5, 20, 28, 0.42), rgba(4, 19, 25, 0.58)),
-                    linear-gradient(90deg, rgba(7, 18, 24, 0.52), rgba(7, 18, 24, 0.18));
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.46), rgba(15, 23, 42, 0.58)),
+                    linear-gradient(90deg, rgba(30, 58, 95, 0.62), rgba(30, 58, 95, 0.18));
         z-index: 1;
     }
 
@@ -111,18 +121,18 @@
     }
 
     .lp-hero .btn-primary {
-        background: #fff;
-        border-color: #fff;
-        color: var(--ink);
-        box-shadow: 0 12px 24px rgba(255,255,255,.12);
+        background: var(--navy-900);
+        border-color: var(--navy-900);
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(30, 58, 95, 0.18);
     }
 
     .lp-hero .btn-primary:hover,
     .lp-hero .btn-primary:focus-visible {
         transform: translateY(-1px);
-        background: #f2f6fb;
-        border-color: #f2f6fb;
-        color: var(--ink);
+        background: var(--navy-800);
+        border-color: var(--navy-800);
+        color: #fff;
     }
 
     .lp-hero .btn-outline-light {
@@ -239,80 +249,199 @@
         }
     }
 
-    .lp-stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-    .lp-stat { padding: 1.25rem 0; }
-    .lp-stat + .lp-stat { border-left: 1px solid var(--line); padding-left: 1.25rem; }
-    .lp-stat-num { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700; line-height: 1.1; }
-    .lp-stat-label { color: var(--muted); font-size: .9rem; }
-
-    .lp-section { padding: 3rem 0; }
-    .lp-section + .lp-section { border-top: 1px solid var(--line); }
-    .lp-section h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: .25rem; }
-    .lp-section .lp-sub { color: var(--muted); margin-bottom: 1.75rem; max-width: 60ch; }
-
-    .lp-steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
-    .lp-steps li { border-top: 2px solid var(--accent); padding-top: .9rem; }
-    .lp-step-no { font-weight: 700; color: var(--accent); }
-    .lp-steps h3 { font-size: 1.05rem; font-weight: 600; margin: .15rem 0 .35rem; }
-    .lp-steps p { color: var(--muted); margin: 0; font-size: .95rem; }
-
-    .lp-cats { display: grid; gap: 0 2.5rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-    .lp-cat { border-top: 1px solid var(--line); padding: 1rem 0; }
-    .lp-cat h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: .2rem; }
-    .lp-cat p { color: var(--muted); margin: 0; font-size: .95rem; }
-
-    .ba { 
-        background: #fff; 
-        border: 1px solid var(--line); 
-        border-radius: 6px; 
-        overflow: hidden; 
-        height: 100%; 
-        display: flex; 
-        flex-direction: column; 
-    }
-    .ba-photos { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--line); }
-    .ba-photos img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
-    .ba-cap { font-size: .85rem; color: var(--muted); padding: .35rem .75rem; }
-
-    .ba-body { 
-        padding: .9rem 1rem 1rem; 
-        display: flex; 
-        flex-direction: column; 
-        flex: 1;
+    .lp-section {
+        padding: 5rem 0;
+        background: #fff;
     }
 
-    .ba-body > p:last-child,
-    .ba-body > div:last-child {
-        margin-top: auto;
-        padding-top: 1rem;
+    .lp-section + .lp-section {
+        border-top: 0;
     }
 
-    .lp-empty { border: 1px dashed #c3cad2; border-radius: 6px; padding: 1.5rem; background: #fff; }
-    .lp-caption { font-size: .9rem; color: var(--muted); margin: .6rem 0 0; }
+    .lp-scope-section {
+        background: #f8fafc;
+        border-top: 0;
+        border-radius: 0;
+        padding: 5rem 1.5rem;
+        margin: 0 auto 0;
+        box-shadow: none;
+    }
+
+    .section-intro {
+        margin-bottom: 2.5rem;
+    }
+
+    .section-kicker {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: .38rem .8rem;
+        border-radius: 999px;
+        background: rgba(30, 58, 95, 0.08);
+        color: var(--navy-900);
+        font-size: .7rem;
+        font-weight: 800;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        margin-bottom: .9rem;
+        border: 1px solid rgba(30, 58, 95, 0.12);
+    }
+
+    .section-intro h2 {
+        font-size: clamp(2.1rem, 3vw, 2.8rem);
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -.04em;
+        margin: 0;
+        color: #0f172a;
+    }
+
+    .lp-section .lp-sub {
+        color: var(--slate-600);
+        margin: .85rem 0 0;
+        max-width: 60ch;
+        font-size: 1rem;
+        line-height: 1.75;
+    }
+
+    .procedure-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.5rem;
+        position: relative;
+    }
+
+    .procedure-card {
+        position: relative;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 1.25rem;
+        padding: 1.5rem 1.25rem;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.03);
+        height: 100%;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .procedure-card:hover,
+    .scope-card:hover,
+    .visi-misi-card:hover,
+    .ba:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    @media (min-width: 992px) {
+        .procedure-card:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: 2.15rem;
+            right: -0.9rem;
+            width: 1.5rem;
+            height: 1px;
+            background: rgba(30, 58, 95, 0.18);
+        }
+    }
+
+    .procedure-step {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .procedure-step-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.6rem;
+        height: 2.6rem;
+        border-radius: 999px;
+        background: var(--navy-900);
+        color: #fff;
+        font-size: .92rem;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .procedure-card h3 {
+        font-size: 1.08rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 .45rem;
+        line-height: 1.5;
+    }
+
+    .procedure-card p {
+        margin: 0;
+        color: var(--slate-600);
+        font-size: .95rem;
+        line-height: 1.7;
+    }
+
+    .scope-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+
+    .scope-card {
+        display: flex;
+        flex-direction: column;
+        gap: .95rem;
+        height: 100%;
+        padding: 1.5rem 1.25rem;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 1.25rem;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.03);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .scope-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 12px;
+        background: rgba(30, 58, 95, 0.08);
+        color: var(--navy-900);
+        font-size: 1.15rem;
+        border: 1px solid rgba(30, 58, 95, 0.08);
+    }
+
+    .scope-card h3 {
+        margin: 0;
+        font-size: 1.08rem;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.5;
+    }
+
+    .scope-card p {
+        margin: 0;
+        color: var(--slate-600);
+        font-size: .95rem;
+        line-height: 1.7;
+    }
 
     .visi-misi-wrap {
-        background: #f6f7f9;
-        border-top: 1px solid var(--line);
-        padding: 3rem 0;
+        background: #f8fafc;
+        padding: 5rem 0;
+        border-top: 0;
     }
 
     .visi-misi-card {
         background: #fff;
-        border: 1px solid rgba(12, 25, 34, 0.08);
-        border-radius: 18px;
-        box-shadow: 0 8px 22px rgba(17, 24, 39, 0.04);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
         transition: transform .2s ease, box-shadow .2s ease;
-    }
-
-    .visi-misi-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
     }
 
     .visi-misi-header {
         display: flex;
         align-items: center;
-        gap: .75rem;
+        gap: .8rem;
         margin-bottom: 1rem;
     }
 
@@ -323,23 +452,24 @@
         align-items: center;
         justify-content: center;
         border-radius: 12px;
-        background: rgba(31, 95, 191, 0.08);
-        color: #0f766e;
+        background: rgba(30, 58, 95, 0.08);
+        color: var(--navy-900);
         font-size: 1.2rem;
+        border: 1px solid rgba(30, 58, 95, 0.08);
     }
 
     .visi-misi-card h3 {
         font-size: 1.25rem;
         font-weight: 700;
-        color: var(--ink);
+        color: #0f172a;
         margin: 0;
     }
 
     .visi-misi-card p,
     .visi-misi-card li {
-        color: var(--muted);
+        color: var(--slate-600);
         font-size: .96rem;
-        line-height: 1.7;
+        line-height: 1.75;
     }
 
     .visi-misi-list {
@@ -364,10 +494,119 @@
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        background: rgba(15, 118, 110, 0.08);
-        color: #0f766e;
+        background: rgba(30, 58, 95, 0.08);
+        color: var(--navy-900);
         font-weight: 700;
         font-size: .78rem;
+    }
+
+    .lp-performance-wrap {
+        background: #fff;
+        padding: 5rem 0;
+    }
+
+    .performance-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+        max-width: 80rem;
+        margin: 0 auto;
+    }
+
+    .ba {
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 1.25rem;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .ba-photos {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0;
+        background: #edf2f7;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    .ba-photos figure {
+        position: relative;
+        overflow: hidden;
+        background: #e5e7eb;
+        min-height: 12rem;
+    }
+
+    .ba-photos img {
+        width: 100%;
+        height: 12rem;
+        object-fit: cover;
+        display: block;
+    }
+
+    .ba-cap {
+        position: absolute;
+        top: .75rem;
+        left: .75rem;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 4.5rem;
+        padding: .38rem .7rem;
+        border-radius: 999px;
+        background: rgba(30, 58, 95, 0.88);
+        color: #fff;
+        font-size: .7rem;
+        font-weight: 700;
+        letter-spacing: .04em;
+    }
+
+    .ba-cap-before { background: rgba(15, 23, 42, 0.72); }
+    .ba-cap-after { background: rgba(30, 58, 95, 0.9); }
+
+    .ba-body {
+        padding: 1rem 1rem 1.1rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        gap: .45rem;
+    }
+
+    .ba-body h3 {
+        margin: 0;
+        color: var(--navy-900);
+        font-size: 1.02rem;
+        font-weight: 800;
+        line-height: 1.45;
+    }
+
+    .ba-body p {
+        margin: 0;
+        color: var(--slate-600);
+        line-height: 1.6;
+    }
+
+    @media (max-width: 991.98px) {
+        .procedure-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .scope-grid,
+        .performance-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .procedure-grid,
+        .scope-grid,
+        .performance-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 @endpush
@@ -380,16 +619,16 @@
 
     $heroSlides = [
         [
-            'image' => '/img/images.jpeg',
-            'alt' => 'Pemandangan perkotaan dan lingkungan SIGAP',
+            'image' => '/img/gmbar1.jpg',
+            'alt' => 'Pemandangan desa Ghuangzou dan aktivitas warga',
         ],
         [
-            'image' => '/img/images (1).jpeg',
-            'alt' => 'Pemandangan alam dan sawah',
+            'image' => '/img/gmbar2.jpg',
+            'alt' => 'Lingkungan pedesaan yang asri dan tertata',
         ],
         [
-            'image' => '/img/images (2).jpeg',
-            'alt' => 'Pemandangan pedesaan dan alam sekitar',
+            'image' => '/img/gmbar3.jpg',
+            'alt' => 'Kehidupan masyarakat dan panorama alam desa',
         ],
     ];
 
@@ -444,74 +683,83 @@
 </section>
 
 <section id="cara-kerjanya" class="lp-section">
-    <h2>Prosedur Pelaporan</h2>
-    <p class="lp-sub">Dari laporan dikirim sampai masalah selesai, ada empat langkah.</p>
-    <ol class="lp-steps">
-        <li>
-            <span class="lp-step-no">1</span>
-            <h3>Anda mengirim laporan</h3>
-            <p>Pilih kategori, tulis masalahnya, lalu tambahkan foto dan alamat.</p>
-        </li>
-        <li>
-            <span class="lp-step-no">2</span>
-            <h3>Admin memeriksa</h3>
-            <p>Jika laporan ditolak, alasannya ditulis di halaman laporan Anda.</p>
-        </li>
-        <li>
-            <span class="lp-step-no">3</span>
-            <h3>Petugas mengerjakan</h3>
-            <p>Petugas sesuai kategori mengambil laporan, lalu mengunggah foto hasil pekerjaan.</p>
-        </li>
-        <li>
-            <span class="lp-step-no">4</span>
-            <h3>Anda menilai hasilnya</h3>
-            <p>Setelah selesai, beri nilai 1 sampai 5 dan tulis ulasan jika perlu.</p>
-        </li>
-    </ol>
-</section>
+    <div class="container">
+        <div class="section-intro text-center mx-auto">
+            <div class="section-kicker">Alur Pengaduan</div>
+            <h2>Prosedur Pelaporan</h2>
+            <p class="lp-sub mx-auto">Dari laporan dikirim sampai masalah selesai, ada empat langkah yang jelas dan transparan.</p>
+        </div>
 
-<section id="yang-bisa-dilaporkan" class="lp-section">
-    <h2>Ruang Lingkup</h2>
-    <p class="lp-sub">Pilih kategori yang paling sesuai agar laporan sampai ke petugas yang tepat.</p>
-    <div class="lp-cats">
-        @foreach ($categories as $category)
-            <div class="lp-cat">
-                <h3>{{ $category->name }}</h3>
-                <p>{{ $category->description }}</p>
-            </div>
-        @endforeach
+        <ol class="procedure-grid list-unstyled mb-0">
+            <li class="procedure-card">
+                <div class="procedure-step">
+                    <span class="procedure-step-badge">1</span>
+                </div>
+                <h3>Anda mengirim laporan</h3>
+                <p>Pilih kategori, tulis masalahnya, lalu tambahkan foto dan alamat.</p>
+            </li>
+            <li class="procedure-card">
+                <div class="procedure-step">
+                    <span class="procedure-step-badge">2</span>
+                </div>
+                <h3>Admin memeriksa</h3>
+                <p>Jika laporan ditolak, alasannya ditulis di halaman laporan Anda.</p>
+            </li>
+            <li class="procedure-card">
+                <div class="procedure-step">
+                    <span class="procedure-step-badge">3</span>
+                </div>
+                <h3>Petugas mengerjakan</h3>
+                <p>Petugas sesuai kategori mengambil laporan, lalu mengunggah foto hasil pekerjaan.</p>
+            </li>
+            <li class="procedure-card">
+                <div class="procedure-step">
+                    <span class="procedure-step-badge">4</span>
+                </div>
+                <h3>Anda menilai hasilnya</h3>
+                <p>Setelah selesai, beri nilai 1 sampai 5 dan tulis ulasan jika perlu.</p>
+            </li>
+        </ol>
     </div>
 </section>
 
-@if ($stats['completed'] > 0)
-    <section id="hasil-pekerjaan" class="lp-section">
-        <h2>Capaian Kinerja</h2>
-        <p class="lp-sub">Foto sebelum dan sesudah dari laporan warga yang sudah dikerjakan petugas</p>
-        <div class="row g-4">
-            @foreach ($completedReports as $report)
-                <div class="col-md-6">
-                    @include('partials.before-after', ['report' => $report])
+<section id="yang-bisa-dilaporkan" class="lp-scope-section lp-section">
+    <div class="container">
+        <div class="section-intro text-center mx-auto">
+            <div class="section-kicker">Kategori Layanan</div>
+            <h2>Ruang Lingkup</h2>
+            <p class="lp-sub mx-auto">Pilih kategori yang paling sesuai agar laporan sampai ke petugas yang tepat.</p>
+        </div>
+
+        <div class="scope-grid">
+            @foreach ($categories as $category)
+                <div class="scope-card">
+                    <div class="scope-icon">
+                        @php
+                            $iconMap = [
+                                'Drainase & Saluran Air' => 'fa-solid fa-water',
+                                'Infrastruktur & Jalan' => 'fa-solid fa-road',
+                                'Kebersihan & Sampah' => 'fa-solid fa-trash',
+                                'Penerangan Jalan' => 'fa-solid fa-lightbulb',
+                                'Layanan Umum' => 'fa-solid fa-city',
+                            ];
+                            $icon = $iconMap[$category->name] ?? 'fa-solid fa-bolt';
+                        @endphp
+                        <i class="{{ $icon }}" aria-hidden="true"></i>
+                    </div>
+                    <h3>{{ $category->name }}</h3>
+                    <p>{{ $category->description }}</p>
                 </div>
             @endforeach
         </div>
-    </section>
-@else
-    <section id="hasil-pekerjaan" class="lp-section">
-        <h2>Capaian Kinerja</h2>
-        <p class="lp-sub">Foto sebelum dan sesudah dari laporan warga yang sudah dikerjakan petugas</p>
-        <div class="lp-empty">
-            <p class="fw-semibold mb-1">Belum ada laporan yang selesai.</p>
-            <p class="text-muted mb-0">
-                Hasil pekerjaan petugas akan tampil di sini, lengkap dengan foto sebelum dan sesudah.
-            </p>
-        </div>
-    </section>
-@endif
+    </div>
+</section>
 
 <section id="visi-misi" class="visi-misi-wrap">
     <div class="container">
-        <div class="text-center mb-4">
-            <h2 class="mb-1">Tentang Kami</h2>
+        <div class="section-intro text-center mx-auto">
+            <div class="section-kicker">Tentang Kami</div>
+            <h2>Visi & Misi</h2>
             <p class="lp-sub mx-auto mb-0">Arah dan komitmen kami dalam melayani laporan Anda.</p>
         </div>
 
@@ -543,6 +791,33 @@
                 </div>
             </div>
         </div>
+    </div>
+</section>
+
+<section id="hasil-pekerjaan" class="lp-performance-wrap">
+    <div class="container">
+        <div class="section-intro text-center mx-auto">
+            <div class="section-kicker">Kinerja Terbaru</div>
+            <h2>Capaian Kinerja</h2>
+            <p class="lp-sub mx-auto">Foto sebelum dan sesudah dari laporan warga yang sudah dikerjakan petugas.</p>
+        </div>
+
+        @if ($stats['completed'] > 0)
+            <div class="performance-grid">
+                @foreach ($completedReports as $report)
+                    <div>
+                        @include('partials.before-after', ['report' => $report])
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="lp-empty">
+                <p class="fw-semibold mb-1">Belum ada laporan yang selesai.</p>
+                <p class="text-muted mb-0">
+                    Hasil pekerjaan petugas akan tampil di sini, lengkap dengan foto sebelum dan sesudah.
+                </p>
+            </div>
+        @endif
     </div>
 </section>
 
@@ -580,7 +855,7 @@
             stopAutoplay();
             autoplayTimer = window.setInterval(() => {
                 setSlide(currentIndex + 1);
-            }, 5500);
+            }, 1000);
         };
 
         const stopAutoplay = () => {

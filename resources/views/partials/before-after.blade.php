@@ -1,12 +1,12 @@
 <article class="ba">
     <div class="ba-photos">
-        <figure class="m-0 bg-white">
-            <img src="{{ $report->photo_before_url }}" alt="Kondisi sebelum: {{ $report->title }}" loading="lazy">
-            <figcaption class="ba-cap">Sebelum</figcaption>
+        <figure class="m-0 position-relative">
+            <img src="{{ $report->photo_before_url }}" alt="Kondisi sebelum: {{ $report->title }}" loading="lazy" class="ba-img">
+            <figcaption class="ba-cap ba-cap-before">Sebelum</figcaption>
         </figure>
-        <figure class="m-0 bg-white">
-            <img src="{{ $report->photo_after_url }}" alt="Kondisi sesudah: {{ $report->title }}" loading="lazy">
-            <figcaption class="ba-cap">Sesudah</figcaption>
+        <figure class="m-0 position-relative">
+            <img src="{{ $report->photo_after_url }}" alt="Kondisi sesudah: {{ $report->title }}" loading="lazy" class="ba-img">
+            <figcaption class="ba-cap ba-cap-after">Sesudah</figcaption>
         </figure>
     </div>
     <div class="ba-body">
